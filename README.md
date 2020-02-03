@@ -46,4 +46,4 @@ BenchmarkCacheView_Render-12              286412              4278 ns/op
 BenchmarkCacheView_RenderPartial-12       316054              3750 ns/op
 ```
 
-The benchmark is base on the [example](example) that mentioned above, the result is depended on how complicated template is.
+The benchmark is base on the [example](example) that mentioned above, the result is depended on how complicated the template is. 
