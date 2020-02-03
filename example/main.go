@@ -13,7 +13,7 @@ var view *views.View
 func init() {
 	// options
 	opts := []views.Option{
-		// views.Suffix(".tmpl"), // tempalte suffix, default to .tmpl.
+		// views.Suffix(".tmpl"), // template suffix, default to .tmpl.
 		// views.Delims("{{", "}}"), // template delimiters, default to "{{" and "}}".
 		views.Theme("default"),
 		views.Layouts("layouts/main", "layouts/header", "layouts/footer"),
