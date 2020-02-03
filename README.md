@@ -8,7 +8,29 @@ Views is a templates(html/template) manager,  it provides the following features
 
 ## Usage
 
+```go
+    // options
+	opts := []views.Option{
+		// views.Suffix(".tmpl"), // template suffix, default to .tmpl.
+		// views.Delims("{{", "}}"), // template delimiters, default to "{{" and "}}".
+		views.Theme("default"),
+		views.Layouts("layouts/main", "layouts/header", "layouts/footer"),
+		// global function map for all templates.
+		views.FuncMap(template.FuncMap{
+			"title": strings.Title,
+		}),
+		// views.Cache(true),
+	}
+    view = views.New("./themes", opts...)
+    // render template with layouts.
+    view.Render(w, "site/index", data)
+    // render tempalte without layouts.
+    view.RenderPartial(w, "/site/partial", data)
+```
+
 Please take a look of the following [example](example):
+
+### Example
 
 ```shell
 $ cd example
