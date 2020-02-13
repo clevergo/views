@@ -40,6 +40,37 @@ func New(dir string, opts ...Option) *View {
 	return v
 }
 
+// Cache enables or disables cache.
+func (v *View) Cache(cache bool) {
+	v.cache = cache
+}
+
+// SetDelims sets the delimiters.
+func (v *View) SetDelims(left, right string) {
+	v.delims[0] = left
+	v.delims[1] = right
+}
+
+// SetSuffix sets the suffix.
+func (v *View) SetSuffix(suffix string) {
+	v.suffix = suffix
+}
+
+// SetTheme sets the theme.
+func (v *View) SetTheme(theme string) {
+	v.theme = theme
+}
+
+// SetLayouts sets the layouts.
+func (v *View) SetLayouts(layouts ...string) {
+	v.layouts = layouts
+}
+
+// SetFuncMap sets the global function map of all templates.
+func (v *View) SetFuncMap(funcMap template.FuncMap) {
+	v.funcMap = funcMap
+}
+
 // Render executes a template with layouts.
 func (v *View) Render(w io.Writer, view string, data interface{}) error {
 	tmpl, err := v.getTemplate(view, true)

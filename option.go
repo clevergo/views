@@ -12,42 +12,41 @@ type Option func(*View)
 // Cache enables or disables cache.
 func Cache(cache bool) Option {
 	return func(v *View) {
-		v.cache = cache
+		v.Cache(cache)
 	}
 }
 
 // Delims sets the delimiters.
 func Delims(left, right string) Option {
 	return func(v *View) {
-		v.delims[0] = left
-		v.delims[1] = right
+		v.SetDelims(left, right)
 	}
 }
 
 // Suffix sets the suffix.
 func Suffix(suffix string) Option {
 	return func(v *View) {
-		v.suffix = suffix
+		v.SetSuffix(suffix)
 	}
 }
 
 // Theme sets the theme.
 func Theme(theme string) Option {
 	return func(v *View) {
-		v.theme = theme
+		v.SetTheme(theme)
 	}
 }
 
 // Layouts sets the layouts.
 func Layouts(layouts ...string) Option {
 	return func(v *View) {
-		v.layouts = layouts
+		v.SetLayouts(layouts...)
 	}
 }
 
 // FuncMap sets the global function map of all templates.
 func FuncMap(funcMap template.FuncMap) Option {
 	return func(v *View) {
-		v.funcMap = funcMap
+		v.SetFuncMap(funcMap)
 	}
 }
