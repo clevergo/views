@@ -71,24 +71,22 @@ func (v *View) SetFuncMap(funcMap template.FuncMap) {
 	v.funcMap = funcMap
 }
 
+// AddFunc add function to funcMap.
+func (v *View) AddFunc(name string, f interface{}) {
+	if v.funcMap == nil {
+		v.funcMap = template.FuncMap{}
+	}
+	v.funcMap[name] = f
+}
+
 // Render executes a template with layouts.
 func (v *View) Render(w io.Writer, view string, data interface{}) error {
-	tmpl, err := v.getTemplate(view, true)
-	if err != nil {
-		return err
-	}
-
-	return v.execute(tmpl, w, data)
+	return v.render(w, view, true, data)
 }
 
 // RenderPartial executes a template without layouts.
 func (v *View) RenderPartial(w io.Writer, view string, data interface{}) error {
-	tmpl, err := v.getTemplate(view, false)
-	if err != nil {
-		return err
-	}
-
-	return v.execute(tmpl, w, data)
+	return v.render(w, view, false, data)
 }
 
 func (v *View) getTemplate(view string, layout bool) (*template.Template, error) {
@@ -132,6 +130,11 @@ func (v *View) findViewFile(view string) string {
 	return path.Join(v.directory, v.theme, view+v.suffix)
 }
 
-func (v *View) execute(tmpl *template.Template, w io.Writer, data interface{}) error {
+func (v *View) render(w io.Writer, view string, layout bool, data interface{}) error {
+	tmpl, err := v.getTemplate(view, layout)
+	if err != nil {
+		return err
+	}
+
 	return tmpl.Execute(w, data)
 }

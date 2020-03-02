@@ -6,6 +6,7 @@ package views
 
 import (
 	"bytes"
+	"html"
 	"html/template"
 	"path"
 	"reflect"
@@ -156,5 +157,17 @@ func BenchmarkCacheView_RenderPartial(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		testCacheView.RenderPartial(w, "site/partial", data)
 		w.Reset()
+	}
+}
+
+func TestAddFuncMap(t *testing.T) {
+	v := &View{}
+	v.AddFunc("title", strings.Title)
+	v.AddFunc("escapeString", html.EscapeString)
+	for _, name := range []string{"title", "escapeString"} {
+		_, ok := v.funcMap[name]
+		if !ok {
+			t.Errorf("failed to add func: %s", name)
+		}
 	}
 }
