@@ -7,46 +7,57 @@ package views
 import "html/template"
 
 // Option is a function that applies on View.
-type Option func(*View)
+type Option func(*Manager)
 
 // Cache enables or disables cache.
-func Cache(cache bool) Option {
-	return func(v *View) {
-		v.Cache(cache)
+func Cache(v bool) Option {
+	return func(m *Manager) {
+		m.cache = v
 	}
 }
 
 // Delims sets the delimiters.
 func Delims(left, right string) Option {
-	return func(v *View) {
-		v.SetDelims(left, right)
+	return func(m *Manager) {
+		m.delims[0] = left
+		m.delims[1] = right
+	}
+}
+
+// DefaultLayout sets the default layout.
+func DefaultLayout(layout string, partials ...string) Option {
+	return func(m *Manager) {
+		m.defaultLayout = layout
+		m.AddLayout(layout, partials...)
+	}
+}
+
+// LayoutsDir sets the layouts directory.
+func LayoutsDir(dir string) Option {
+	return func(m *Manager) {
+		m.layoutsDir = dir
+	}
+}
+
+// PartialsDir sets the partials directory.
+func PartialsDir(dir string) Option {
+	return func(m *Manager) {
+		m.partialsDir = dir
 	}
 }
 
 // Suffix sets the suffix.
 func Suffix(suffix string) Option {
-	return func(v *View) {
-		v.SetSuffix(suffix)
-	}
-}
-
-// Theme sets the theme.
-func Theme(theme string) Option {
-	return func(v *View) {
-		v.SetTheme(theme)
-	}
-}
-
-// Layouts sets the layouts.
-func Layouts(layouts ...string) Option {
-	return func(v *View) {
-		v.SetLayouts(layouts...)
+	return func(m *Manager) {
+		m.suffix = suffix
 	}
 }
 
 // FuncMap sets the global function map of all templates.
 func FuncMap(funcMap template.FuncMap) Option {
-	return func(v *View) {
-		v.SetFuncMap(funcMap)
+	return func(m *Manager) {
+		for name, f := range funcMap {
+			m.AddFunc(name, f)
+		}
 	}
 }
