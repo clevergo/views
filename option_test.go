@@ -13,9 +13,9 @@ import (
 func TestCache(t *testing.T) {
 	tests := []bool{false, true, false}
 	for _, cache := range tests {
-		v := New("", Cache(cache))
-		if v.cache != cache {
-			t.Errorf("expected cache %t, got %t", cache, v.cache)
+		m := New("", Cache(cache))
+		if m.cache != cache {
+			t.Errorf("expected cache %t, got %t", cache, m.cache)
 		}
 	}
 }
@@ -27,13 +27,14 @@ func TestDelimis(t *testing.T) {
 		{"{{#", "#}}"},
 	}
 	for _, test := range tests {
-		v := New("", Delims(test[0], test[1]))
-		if !reflect.DeepEqual(v.delims, test) {
-			t.Errorf("expected delims %v, got %v", test, v.delims)
+		m := New("", Delims(test[0], test[1]))
+		if !reflect.DeepEqual(m.delims, test) {
+			t.Errorf("expected delims %v, got %v", test, m.delims)
 		}
 	}
 }
 
+/*
 func TestLayout(t *testing.T) {
 	tests := [][]string{
 		{},
@@ -41,44 +42,75 @@ func TestLayout(t *testing.T) {
 		{"foo", "bar"},
 	}
 	for _, layouts := range tests {
-		v := New("", Layouts(layouts...))
+		m := New("", Layouts(layouts...))
 		if !reflect.DeepEqual(v.layouts, layouts) {
 			t.Errorf("expected layouts %v, got %v", layouts, v.layouts)
 		}
 	}
 }
+*/
 
 func TestSuffix(t *testing.T) {
 	tests := []string{".tmpl", ".tpl", ".html", "htm"}
 	for _, suffix := range tests {
-		v := New("", Suffix(suffix))
-		if v.suffix != suffix {
-			t.Errorf("expected suffix %q, got %q", suffix, v.suffix)
+		m := New("", Suffix(suffix))
+		if m.suffix != suffix {
+			t.Errorf("expected suffix %q, got %q", suffix, m.suffix)
 		}
 	}
 }
 
-func TestTheme(t *testing.T) {
-	tests := []string{"foo", "bar"}
-	for _, theme := range tests {
-		v := New("", Theme(theme))
-		if v.theme != theme {
-			t.Errorf("expected theme %q, got %q", theme, v.theme)
+func TestDefaultLayout(t *testing.T) {
+	tests := []struct {
+		layout   string
+		partials []string
+	}{
+		{"main", []string{"head", "header", "footer"}},
+		{"page", []string{"head"}},
+	}
+	for _, test := range tests {
+		m := New("", DefaultLayout(test.layout, test.partials...))
+		if m.defaultLayout != test.layout {
+			t.Errorf("expected default layout %q, got %q", test.layout, m.defaultLayout)
+		}
+	}
+}
+
+func TestLayoutsDir(t *testing.T) {
+	tests := []string{"layouts1", "layouts2"}
+	for _, dir := range tests {
+		m := New("", LayoutsDir(dir))
+		if m.layoutsDir != dir {
+			t.Errorf("expected layouts directory %q, got %q", dir, m.partialsDir)
+		}
+	}
+}
+
+func TestPartialsDir(t *testing.T) {
+	tests := []string{"partials1", "partials2"}
+	for _, dir := range tests {
+		m := New("", PartialsDir(dir))
+		if m.partialsDir != dir {
+			t.Errorf("expected partials directory %q, got %q", dir, m.partialsDir)
 		}
 	}
 }
 
 func TestFuncMap(t *testing.T) {
 	tests := []template.FuncMap{
-		{},
 		{
 			"foo": func() string { return "foo" },
 		},
+		{
+			"bar": func() string { return "bar" },
+		},
 	}
 	for _, funcMap := range tests {
-		v := New("", FuncMap(funcMap))
-		if !reflect.DeepEqual(v.funcMap, funcMap) {
-			t.Errorf("expected funcMap %v, got %v", funcMap, v.funcMap)
+		m := New("", FuncMap(funcMap))
+		for name := range funcMap {
+			if _, ok := m.funcMap[name]; !ok {
+				t.Errorf("failed to add function %s", name)
+			}
 		}
 	}
 }
