@@ -9,6 +9,10 @@ Views is a templates(html/template) manager,  it provides the following features
 
 ## Usage
 
+```shell
+$ go get github.com/clevergo/views/v2
+```
+
 Please take a look of the [example](example).
 
 ### Structure

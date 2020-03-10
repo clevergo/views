@@ -5,7 +5,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/clevergo/views"
+	"github.com/clevergo/clevergo"
+	"github.com/clevergo/views/v2"
 )
 
 var manager *views.Manager
@@ -40,25 +41,26 @@ func init() {
 	})
 }
 
-func home(w http.ResponseWriter, r *http.Request) {
-	manager.Render(w, "site/index", views.Context{
+func home(ctx *clevergo.Context) error {
+	return manager.Render(ctx.Response, "site/index", views.Context{
 		"title": "home",
 	})
 }
 
-func login(w http.ResponseWriter, r *http.Request) {
-	manager.RenderLayout(w, "page", "user/login", nil)
+func login(ctx *clevergo.Context) error {
+	return manager.RenderLayout(ctx.Response, "page", "user/login", nil)
 }
 
-func partial(w http.ResponseWriter, r *http.Request) {
-	manager.RenderPartial(w, "site/partial", views.Context{
+func partial(ctx *clevergo.Context) error {
+	return manager.RenderPartial(ctx.Response, "site/partial", views.Context{
 		"title": "partial",
 	})
 }
 
 func main() {
-	http.HandleFunc("/", home)
-	http.HandleFunc("/login", login)
-	http.HandleFunc("/partial", partial)
-	http.ListenAndServe(":1234", http.DefaultServeMux)
+	router := clevergo.NewRouter()
+	router.Get("/", home)
+	router.Get("/login", login)
+	router.Get("/partial", partial)
+	http.ListenAndServe(":1234", router)
 }

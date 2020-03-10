@@ -1,0 +1,5 @@
+github.com/clevergo/clevergo v1.4.0 h1:FNRUZPRBLDMrwn+giPsc5+usEqJ+vqhnFSH5KX97AUE=
+github.com/clevergo/clevergo v1.4.0/go.mod h1:/BB51A8ohBG/GCHbN7mUPK6vJNm6XXC+4V/yS0c7RsA=
+github.com/clevergo/views v1.2.0 h1:MNuP7mg4HBeibLBClmYR6qOUATbldLJBv6kNealZgqc=
+github.com/clevergo/views/v2 v2.0.3 h1:YATEFDBX/aZtuPYjjZMP1HjOFRRm6QeYW7CaOMSLek8=
+github.com/clevergo/views/v2 v2.0.3/go.mod h1:voRo/uJnoEOof8EkhQuIXIX9LzblVORa/fxxvdQzrs8=
