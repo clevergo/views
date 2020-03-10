@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"html/template"
 	"io"
+	"io/ioutil"
+	"net/http"
 	"path"
 	"sync"
 )
@@ -35,6 +37,7 @@ type AfterRenderEvent struct {
 
 // Manager is the views manager.
 type Manager struct {
+	fs             http.FileSystem
 	path           string
 	defaultLayout  string
 	layouts        map[string]*layout
@@ -50,9 +53,11 @@ type Manager struct {
 	onAfterRender  []func(*AfterRenderEvent) error
 }
 
-// New returns a manager with the given path and options.
-func New(path string, opts ...Option) *Manager {
+// New returns a manager with the given filesystem, path and options.
+// Path is relatived to filesystem.
+func New(fs http.FileSystem, path string, opts ...Option) *Manager {
 	m := &Manager{
+		fs:            fs,
 		path:          path,
 		suffix:        ".tmpl",
 		delims:        []string{"{{", "}}"},
@@ -140,12 +145,23 @@ func (m *Manager) getView(layout, view string) (*View, error) {
 }
 
 func (m *Manager) newView(files []string) (*View, error) {
-	tmpl, err := template.New(path.Base(files[0])).
+	tmpl := template.New(path.Base(files[0])).
 		Funcs(m.funcMap).
-		Delims(m.delims[0], m.delims[1]).
-		ParseFiles(files...)
-	if err != nil {
-		return nil, err
+		Delims(m.delims[0], m.delims[1])
+
+	for _, filename := range files {
+		file, err := m.fs.Open(filename)
+		if err != nil {
+			return nil, err
+		}
+		content, err := ioutil.ReadAll(file)
+		if err != nil {
+			return nil, err
+		}
+		tmpl, err = tmpl.Parse(string(content))
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &View{tmpl}, nil
