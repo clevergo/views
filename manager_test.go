@@ -26,11 +26,9 @@ var (
 
 func TestMain(m *testing.M) {
 	_, filename, _, _ := runtime.Caller(0)
-	testFileSystem = http.Dir(path.Join(path.Dir(filename), "example"))
-	viewPath := "views"
+	testFileSystem = http.Dir(path.Join(path.Dir(filename), "example", "views"))
 	testManager = New(
 		testFileSystem,
-		viewPath,
 		FuncMap(template.FuncMap{
 			"title": strings.Title,
 		}),
@@ -219,7 +217,7 @@ func TestManagerOnBeforeRender(t *testing.T) {
 		res += "bar"
 		return expectedErr
 	}
-	m := New(testFileSystem, "")
+	m := New(testFileSystem)
 	m.RegisterOnBeforeRender(f)
 	m.RegisterOnBeforeRender(f2)
 	err := m.beforeRender(nil, "", "", Context{})
@@ -242,7 +240,7 @@ func TestManagerOnAfterRender(t *testing.T) {
 		res += "bar"
 		return expectedErr
 	}
-	m := New(testFileSystem, "")
+	m := New(testFileSystem)
 	m.RegisterOnAfterRender(f)
 	m.RegisterOnAfterRender(f2)
 	err := m.afterRender(nil, "", "", Context{})

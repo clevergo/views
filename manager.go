@@ -53,12 +53,10 @@ type Manager struct {
 	onAfterRender  []func(*AfterRenderEvent) error
 }
 
-// New returns a manager with the given filesystem, path and options.
-// Path is relatived to filesystem.
-func New(fs http.FileSystem, path string, opts ...Option) *Manager {
+// New returns a manager with the given filesystem and options.
+func New(fs http.FileSystem, opts ...Option) *Manager {
 	m := &Manager{
 		fs:            fs,
-		path:          path,
 		suffix:        ".tmpl",
 		delims:        []string{"{{", "}}"},
 		mutex:         &sync.Mutex{},
@@ -168,15 +166,15 @@ func (m *Manager) newView(files []string) (*View, error) {
 }
 
 func (m *Manager) findViewFile(view string) string {
-	return path.Join(m.path, m.getFileName(view))
+	return path.Join(m.getFileName(view))
 }
 
 func (m *Manager) findLayoutFile(layout string) string {
-	return path.Join(m.path, m.layoutsDir, m.getFileName(layout))
+	return path.Join(m.layoutsDir, m.getFileName(layout))
 }
 
 func (m *Manager) findPartialFile(partial string) string {
-	return path.Join(m.path, m.layoutsDir, m.partialsDir, m.getFileName(partial))
+	return path.Join(m.layoutsDir, m.partialsDir, m.getFileName(partial))
 }
 
 func (m *Manager) getFileName(view string) string {
