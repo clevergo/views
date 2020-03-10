@@ -19,38 +19,20 @@ type layout struct {
 	partials []string
 }
 
-// BeforeRenderEvent is an evnet that trigger before rendering an view.
-type BeforeRenderEvent struct {
-	Writer  io.Writer
-	Layout  string
-	View    string
-	Context Context
-}
-
-// AfterRenderEvent is an evnet that trigger after rendering an view.
-type AfterRenderEvent struct {
-	w      io.Writer
-	layout string
-	view   string
-	ctx    Context
-}
-
 // Manager is the views manager.
 type Manager struct {
-	fs             http.FileSystem
-	path           string
-	defaultLayout  string
-	layouts        map[string]*layout
-	layoutsDir     string
-	partialsDir    string
-	suffix         string
-	delims         []string
-	funcMap        template.FuncMap
-	cache          bool
-	mutex          *sync.Mutex
-	views          map[string]map[string]*View
-	onBeforeRender []func(*BeforeRenderEvent) error
-	onAfterRender  []func(*AfterRenderEvent) error
+	fs            http.FileSystem
+	path          string
+	defaultLayout string
+	layouts       map[string]*layout
+	layoutsDir    string
+	partialsDir   string
+	suffix        string
+	delims        []string
+	funcMap       template.FuncMap
+	cache         bool
+	mutex         *sync.Mutex
+	views         map[string]map[string]*View
 }
 
 // New returns a manager with the given filesystem and options.
@@ -90,18 +72,18 @@ func (m *Manager) AddFunc(name string, f interface{}) {
 }
 
 // Render renders a view with default layout.
-func (m *Manager) Render(w io.Writer, view string, ctx Context) error {
-	return m.RenderLayout(w, m.defaultLayout, view, ctx)
+func (m *Manager) Render(w io.Writer, view string, data interface{}) error {
+	return m.RenderLayout(w, m.defaultLayout, view, data)
 }
 
 // RenderLayout renders a view with particular layout.
-func (m *Manager) RenderLayout(w io.Writer, layout, view string, ctx Context) error {
-	return m.render(w, layout, view, ctx)
+func (m *Manager) RenderLayout(w io.Writer, layout, view string, data interface{}) error {
+	return m.render(w, layout, view, data)
 }
 
 // RenderPartial renders a view without layout.
-func (m *Manager) RenderPartial(w io.Writer, view string, ctx Context) error {
-	return m.render(w, "", view, ctx)
+func (m *Manager) RenderPartial(w io.Writer, view string, data interface{}) error {
+	return m.render(w, "", view, data)
 }
 
 func (m *Manager) getView(layout, view string) (*View, error) {
@@ -156,6 +138,7 @@ func (m *Manager) newView(files []string) (*View, error) {
 		if err != nil {
 			return nil, err
 		}
+		defer file.Close()
 		tmpl, err = tmpl.Parse(string(content))
 		if err != nil {
 			return nil, err
@@ -181,58 +164,11 @@ func (m *Manager) getFileName(view string) string {
 	return view + m.suffix
 }
 
-func (m *Manager) render(w io.Writer, layout, view string, ctx Context) error {
+func (m *Manager) render(w io.Writer, layout, view string, data interface{}) error {
 	v, err := m.getView(layout, view)
 	if err != nil {
 		return err
 	}
 
-	if ctx == nil {
-		ctx = Context{}
-	}
-
-	if err = m.beforeRender(w, layout, view, ctx); err != nil {
-		return err
-	}
-
-	if err = v.Execute(w, ctx); err != nil {
-		return err
-	}
-
-	return m.afterRender(w, layout, view, ctx)
-}
-
-// RegisterOnBeforeRender registers a BeforeRenderEvent listener.
-func (m *Manager) RegisterOnBeforeRender(f func(*BeforeRenderEvent) error) {
-	m.onBeforeRender = append(m.onBeforeRender, f)
-}
-
-func (m *Manager) beforeRender(w io.Writer, layout, view string, ctx Context) (err error) {
-	if m.onBeforeRender != nil {
-		event := &BeforeRenderEvent{w, layout, view, ctx}
-		for _, f := range m.onBeforeRender {
-			if err = f(event); err != nil {
-				return
-			}
-		}
-	}
-	return
-}
-
-// RegisterOnAfterRender registers a BeforeRenderEvent listener.
-func (m *Manager) RegisterOnAfterRender(f func(*AfterRenderEvent) error) {
-	m.onAfterRender = append(m.onAfterRender, f)
-}
-
-func (m *Manager) afterRender(w io.Writer, layout, view string, ctx Context) (err error) {
-	if m.onAfterRender != nil {
-		event := &AfterRenderEvent{w, layout, view, ctx}
-		for _, f := range m.onAfterRender {
-			if err = f(event); err != nil {
-				return
-			}
-		}
-	}
-
-	return
+	return v.Execute(w, data)
 }

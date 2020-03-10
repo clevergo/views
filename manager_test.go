@@ -6,7 +6,6 @@ package views
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"html"
 	"html/template"
@@ -62,33 +61,11 @@ func TestManagerRender(t *testing.T) {
 			t.Errorf("render result doesn't contains %q", s)
 		}
 	}
-	errBeforeRender := errors.New("before render")
-	m.RegisterOnBeforeRender(func(_ *BeforeRenderEvent) error {
-		return errBeforeRender
-	})
-	err = m.Render(w, "site/index", map[string]interface{}{
-		"title": "home",
-	})
-	if err == nil || err != errBeforeRender {
-		t.Errorf("expected error %q, got %q", errBeforeRender, err)
-	}
-
-	m.onBeforeRender = m.onBeforeRender[:0]
-	errAfterRender := errors.New("after render")
-	m.RegisterOnAfterRender(func(_ *AfterRenderEvent) error {
-		return errAfterRender
-	})
-	err = m.Render(w, "site/index", map[string]interface{}{
-		"title": "home",
-	})
-	if err == nil || err != errAfterRender {
-		t.Errorf("expected error %q, got %q", errAfterRender, err)
-	}
 }
 
 func TestManagerPartial(t *testing.T) {
 	w := bytes.NewBuffer(nil)
-	err := testManager.RenderPartial(w, "site/partial", Context{
+	err := testManager.RenderPartial(w, "site/partial", map[string]interface{}{
 		"title": "partial",
 	})
 	if err != nil {
@@ -203,51 +180,5 @@ func TestManagerAddFuncMap(t *testing.T) {
 		if !ok {
 			t.Errorf("failed to add func: %s", name)
 		}
-	}
-}
-
-func TestManagerOnBeforeRender(t *testing.T) {
-	res := ""
-	f := func(event *BeforeRenderEvent) error {
-		res += "foo"
-		return nil
-	}
-	expectedErr := errors.New("BeforeRenderEvent err")
-	f2 := func(event *BeforeRenderEvent) error {
-		res += "bar"
-		return expectedErr
-	}
-	m := New(testFileSystem)
-	m.RegisterOnBeforeRender(f)
-	m.RegisterOnBeforeRender(f2)
-	err := m.beforeRender(nil, "", "", Context{})
-	if res != "foobar" {
-		t.Errorf("expected result %q, got %q", "foobar", res)
-	}
-	if err == nil || err != expectedErr {
-		t.Errorf("expected error %q, got %q", expectedErr, err)
-	}
-}
-
-func TestManagerOnAfterRender(t *testing.T) {
-	res := ""
-	f := func(event *AfterRenderEvent) error {
-		res += "foo"
-		return nil
-	}
-	expectedErr := errors.New("AfterRenderEvent err")
-	f2 := func(event *AfterRenderEvent) error {
-		res += "bar"
-		return expectedErr
-	}
-	m := New(testFileSystem)
-	m.RegisterOnAfterRender(f)
-	m.RegisterOnAfterRender(f2)
-	err := m.afterRender(nil, "", "", Context{})
-	if res != "foobar" {
-		t.Errorf("expected result %q, got %q", "foobar", res)
-	}
-	if err == nil || err != expectedErr {
-		t.Errorf("expected error %q, got %q", expectedErr, err)
 	}
 }
