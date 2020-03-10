@@ -18,7 +18,7 @@ func init() {
 		// views.Delims("{{", "}}"), // template delimiters, default to "{{" and "}}".
 		views.DefaultLayout("main", "head", "header", "footer"),
 		views.LayoutsDir("layouts"),   // layout directory, relatived to views path.
-		views.PartialsDir("partials"), // partials layout, relatived to layout path.
+		views.PartialsDir("partials"), // partials layout, relatived to layouts directory.
 		// global function map for all templates.
 		views.FuncMap(template.FuncMap{
 			"title": strings.Title,

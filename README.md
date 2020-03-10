@@ -13,7 +13,7 @@ Please take a look of the [example](example).
 
 ### Structure
 
-Before digging into it, let's take a look of an example views structure:
+Let's take a look of an example views structure before digging into it:
 
 ```
 layouts/                  contains layout files.
@@ -46,7 +46,7 @@ opts := []views.Option{
 	// views.Delims("{{", "}}"), // template delimiters, default to "{{" and "}}".
 	views.DefaultLayout("main", "head", "header", "footer"),
 	views.LayoutsDir("layouts"),   // layout directory, relatived to views path.
-	views.PartialsDir("partials"), // partials layout, relatived to layout path.
+	views.PartialsDir("partials"), // partials layout, relatived to layouts directory.
 	// global function map for all templates.
 	views.FuncMap(template.FuncMap{
 		"title": strings.Title,
