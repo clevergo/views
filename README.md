@@ -3,59 +3,95 @@
 Views is a templates(html/template) manager,  it provides the following features:
 
 - **Nested template**: it is easy to create a complicated template, see [usage](#usage).
-- **Cache**: allow to cache parsed templates(default to disable), see [benchmark](#benchmark).
-- **Global settings**: it provides some useful setting for all templates, such as suffix, delimiters, funcMap etc. 
+- **Cache**: allow to cache parsed templates(default to enabled), see [benchmark](#benchmark).
+- **Global settings**: it provides some useful setting for all templates, such as suffix, delimiters, funcMap etc.
+- **[Hooks](#hooks)**: provides two hooks, `BeforeRenderEvent` and `AfterRenderEvent`.
 
 ## Usage
 
-```go
-// options
-opts := []views.Option{
-    // views.Suffix(".tmpl"), // template suffix, default to .tmpl.
-    // views.Delims("{{", "}}"), // template delimiters, default to "{{" and "}}".
-    views.Theme("default"),
-    views.Layouts("layouts/main", "layouts/header", "layouts/footer"),
-    // global function map for all templates.
-    views.FuncMap(template.FuncMap{
-        "title": strings.Title,
-    }),
-    // views.Cache(true),
-}
-view = views.New("./themes", opts...)
-// render template with layouts.
-view.Render(w, "site/index", data)
-// render tempalte without layouts.
-view.RenderPartial(w, "/site/partial")
+Please take a look of the [example](example).
+
+### Structure
+
+Before digging into it, let's take a look of an example views structure:
+
+```
+layouts/                  contains layout files.
+    main.tmpl
+    page.tmpl
+    ...
+    partials/             contains partial files.
+        head.tmpl
+        header.tmpl
+        footer.tmpl
+        ...
+site/                     contains site's views.
+    home.tmpl
+    ...
+user/                     contains user's views.
+    login.tmpl
+    setting.tmpl
+    signup.tmpl
+    ...
+...
 ```
 
-Please take a look of the following [example](example):
+### Initialize
 
-### Example
+```go
+viewsPath := "views" // views path.
+// options
+opts := []views.Option{
+	// views.Suffix(".tmpl"), // template suffix, default to .tmpl.
+	// views.Delims("{{", "}}"), // template delimiters, default to "{{" and "}}".
+	views.DefaultLayout("main", "head", "header", "footer"),
+	views.LayoutsDir("layouts"),   // layout directory, relatived to views path.
+	views.PartialsDir("partials"), // partials layout, relatived to layout path.
+	// global function map for all templates.
+	views.FuncMap(template.FuncMap{
+		"title": strings.Title,
+	}),
+	views.Cache(false), // disabled caching for developing.
+}
+manager = views.New(viewsPath, opts...)
+// add a new layout.
+manager.AddLayout("page", "head")
+// add function to global funcMap
+manager.AddFunc("foo", func() string {
+    return "bar"
+})
+```
 
-```shell
-$ cd example
-$ go run main.go
+### Render
 
-$ curl http://localhost:1234/
-<html>
-    <head>
-        <title>Home</title>
-    </head>
-    <body>
-        <h1>Hello World</h1>
-        <footer>I am footer</footer>
-    </body>
-</html>
+```go
+// render with default layout
+manager.Render(w, "site/index", nil)
 
-$ curl http://localhost:1234/partial
-<html>
-    <head>
-        <title>Standalone</title>
-    </head>
-    <body>
-        <h1>Standalone</h1>
-    </body>
-</html>
+// render with particular layout: page.
+manager.RenderLayout(w, "page", "user/login", nil)
+
+// render with data
+manager.Render(w, "site/index", views.Context{
+	"foo": "bar",
+})
+
+// render without layout.
+manager.RenderPartial(w, "site/partial", nil)
+```
+
+## Hooks
+
+```go
+// regiters before render listener.
+manager.RegisterOnBeforeRender(func(event *views.BeforeRenderEvent) error {
+	return nil
+})
+
+// regiters after render listener.
+manager.RegisterOnAfterRender(func(event *views.AfterRenderEvent) error {
+	return nil
+})
 ```
 
 ## Benchmark

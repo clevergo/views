@@ -87,14 +87,14 @@ func TestManagerRender(t *testing.T) {
 func TestManagerPartial(t *testing.T) {
 	w := bytes.NewBuffer(nil)
 	err := testManager.RenderPartial(w, "site/partial", Context{
-		"title": "standalone",
+		"title": "partial",
 	})
 	if err != nil {
 		t.Errorf("failed to render: %s", err)
 	}
 	strs := []string{
-		"<h1>Standalone</h1>",
-		"<title>Standalone</title>",
+		"<h1>Partial</h1>",
+		"<title>Partial</title>",
 		"<head>",
 	}
 	for _, s := range strs {
