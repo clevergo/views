@@ -7,12 +7,16 @@ import (
 
 	"github.com/clevergo/clevergo"
 	"github.com/clevergo/views/v2"
+	"github.com/gobuffalo/packr/v2"
 )
 
-var manager *views.Manager
+var (
+	manager *views.Manager
+	fs      http.FileSystem
+)
 
 func init() {
-	viewsPath := "views" // views path.
+	fs = packr.New("views", "./views") // file system.
 	// options
 	opts := []views.Option{
 		// views.Suffix(".tmpl"), // template suffix, default to .tmpl.
@@ -26,7 +30,7 @@ func init() {
 		}),
 		views.Cache(false), // disabled caching for developing.
 	}
-	manager = views.New(viewsPath, opts...)
+	manager = views.New(fs, opts...)
 	// add main layout.
 	manager.AddLayout("main", "head", "header", "footer")
 	// add a new layout.
@@ -64,5 +68,6 @@ func main() {
 	router.Get("/", home)
 	router.Get("/login", login)
 	router.Get("/partial", partial)
+	router.ServeFiles("/assets/*filepath", packr.New("assets", "./assets"))
 	http.ListenAndServe(":1234", router)
 }
