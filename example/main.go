@@ -11,19 +11,33 @@ import (
 var manager *views.Manager
 
 func init() {
+	viewsPath := "views" // views path.
 	// options
 	opts := []views.Option{
 		// views.Suffix(".tmpl"), // template suffix, default to .tmpl.
 		// views.Delims("{{", "}}"), // template delimiters, default to "{{" and "}}".
 		views.DefaultLayout("main", "head", "header", "footer"),
+		views.LayoutsDir("layouts"),   // layout directory, relatived to views path.
+		views.PartialsDir("partials"), // partials layout, relatived to layout path.
 		// global function map for all templates.
 		views.FuncMap(template.FuncMap{
 			"title": strings.Title,
 		}),
-		// views.Cache(true), // disabled it for developing.
+		views.Cache(false), // disabled caching for developing.
 	}
-	manager = views.New("views", opts...)
+	manager = views.New(viewsPath, opts...)
+	// add a new layout.
 	manager.AddLayout("page", "head")
+
+	// regiters before render listener.
+	manager.RegisterOnBeforeRender(func(event *views.BeforeRenderEvent) error {
+		return nil
+	})
+
+	// regiters after render listener.
+	manager.RegisterOnAfterRender(func(event *views.AfterRenderEvent) error {
+		return nil
+	})
 }
 
 func home(w http.ResponseWriter, r *http.Request) {
@@ -33,14 +47,12 @@ func home(w http.ResponseWriter, r *http.Request) {
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
-	manager.RenderLayout(w, "page", "site/login", views.Context{
-		"title": "standalone",
-	})
+	manager.RenderLayout(w, "page", "user/login", nil)
 }
 
 func partial(w http.ResponseWriter, r *http.Request) {
 	manager.RenderPartial(w, "site/partial", views.Context{
-		"title": "standalone",
+		"title": "partial",
 	})
 }
 

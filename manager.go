@@ -19,10 +19,10 @@ type layout struct {
 
 // BeforeRenderEvent is an evnet that trigger before rendering an view.
 type BeforeRenderEvent struct {
-	w      io.Writer
-	layout string
-	view   string
-	ctx    Context
+	Writer  io.Writer
+	Layout  string
+	View    string
+	Context Context
 }
 
 // AfterRenderEvent is an evnet that trigger after rendering an view.
@@ -59,7 +59,8 @@ func New(path string, opts ...Option) *Manager {
 		mutex:         &sync.Mutex{},
 		defaultLayout: "main",
 		layoutsDir:    "layouts",
-		partialsDir:   "layouts/partials",
+		partialsDir:   "partials",
+		cache:         true,
 	}
 
 	for _, opt := range opts {
@@ -159,7 +160,7 @@ func (m *Manager) findLayoutFile(layout string) string {
 }
 
 func (m *Manager) findPartialFile(partial string) string {
-	return path.Join(m.path, m.partialsDir, m.getFileName(partial))
+	return path.Join(m.path, m.layoutsDir, m.partialsDir, m.getFileName(partial))
 }
 
 func (m *Manager) getFileName(view string) string {
@@ -170,6 +171,10 @@ func (m *Manager) render(w io.Writer, layout, view string, ctx Context) error {
 	v, err := m.getView(layout, view)
 	if err != nil {
 		return err
+	}
+
+	if ctx == nil {
+		ctx = Context{}
 	}
 
 	if err = m.beforeRender(w, layout, view, ctx); err != nil {
