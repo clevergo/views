@@ -25,10 +25,9 @@ func Delims(left, right string) Option {
 }
 
 // DefaultLayout sets the default layout.
-func DefaultLayout(layout string, partials ...string) Option {
+func DefaultLayout(name string) Option {
 	return func(m *Manager) {
-		m.defaultLayout = layout
-		m.AddLayout(layout, partials...)
+		m.defaultLayout = name
 	}
 }
 

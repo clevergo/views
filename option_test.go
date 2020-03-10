@@ -62,14 +62,13 @@ func TestSuffix(t *testing.T) {
 
 func TestDefaultLayout(t *testing.T) {
 	tests := []struct {
-		layout   string
-		partials []string
+		layout string
 	}{
-		{"main", []string{"head", "header", "footer"}},
-		{"page", []string{"head"}},
+		{"main"},
+		{"page"},
 	}
 	for _, test := range tests {
-		m := New("", DefaultLayout(test.layout, test.partials...))
+		m := New("", DefaultLayout(test.layout))
 		if m.defaultLayout != test.layout {
 			t.Errorf("expected default layout %q, got %q", test.layout, m.defaultLayout)
 		}

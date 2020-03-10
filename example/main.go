@@ -17,7 +17,7 @@ func init() {
 	opts := []views.Option{
 		// views.Suffix(".tmpl"), // template suffix, default to .tmpl.
 		// views.Delims("{{", "}}"), // template delimiters, default to "{{" and "}}".
-		views.DefaultLayout("main", "head", "header", "footer"),
+		views.DefaultLayout("main"),
 		views.LayoutsDir("layouts"),   // layout directory, relatived to views path.
 		views.PartialsDir("partials"), // partials layout, relatived to layouts directory.
 		// global function map for all templates.
@@ -27,6 +27,8 @@ func init() {
 		views.Cache(false), // disabled caching for developing.
 	}
 	manager = views.New(viewsPath, opts...)
+	// add main layout.
+	manager.AddLayout("main", "head", "header", "footer")
 	// add a new layout.
 	manager.AddLayout("page", "head")
 
