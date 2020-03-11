@@ -92,10 +92,10 @@ manager.RenderPartial(w, "site/partial", nil)
 
 ```shell
 $ go test -bench=.
-BenchmarkView_Render-12                     5670            235214 ns/op
-BenchmarkView_RenderPartial-12             16450             64282 ns/op
-BenchmarkCacheView_Render-12              237700              4724 ns/op
-BenchmarkCacheView_RenderPartial-12       364700              3269 ns/op
+BenchmarkManagerRender-12                           6873            237087 ns/op
+BenchmarkManagerRenderPartial-12                   29976             37867 ns/op
+BenchmarkManagerRenderCache-12                    236474              4909 ns/op
+BenchmarkManagerRenderPartialCache-12             359468              3175 ns/op
 ```
 
 The benchmark is base on the [example](example) that mentioned above, the result is depended on how complicated the template is. 

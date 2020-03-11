@@ -86,9 +86,9 @@ func TestManagerPartial(t *testing.T) {
 	}
 }
 
-func TestManagerGetView(t *testing.T) {
+func TestManagerGetTempalte(t *testing.T) {
 	m := &Manager{}
-	_, err := m.getView("invalid", "view")
+	_, err := m.getTemplate("invalid", "view")
 	expcetedErr := fmt.Sprintf("no such layout %q", "invalid")
 	if err == nil || err.Error() != expcetedErr {
 		t.Errorf("expected error %s, got %s", expcetedErr, err)
@@ -110,11 +110,11 @@ func TestManagerGetView(t *testing.T) {
 		} else {
 			m.RenderPartial(bytes.NewBuffer(nil), test.view, nil)
 		}
-		cachedV, ok := m.views[test.layout][test.view]
+		cachedV, ok := m.templates[test.layout][test.view]
 		if !ok {
 			t.Fatalf("failed to cache view: %s", test.view)
 		}
-		v, err := m.getView(test.layout, test.view)
+		v, err := m.getTemplate(test.layout, test.view)
 		if err != nil || !reflect.DeepEqual(cachedV, v) {
 			t.Errorf("failed to retrieve cached view: %s", test.view)
 		}
@@ -130,7 +130,7 @@ func TestManagerGetView(t *testing.T) {
 	}
 }
 
-func BenchmarkView_Render(b *testing.B) {
+func BenchmarkManagerRender(b *testing.B) {
 	data := map[string]interface{}{
 		"title": "home",
 	}
@@ -141,7 +141,7 @@ func BenchmarkView_Render(b *testing.B) {
 	}
 }
 
-func BenchmarkView_RenderPartial(b *testing.B) {
+func BenchmarkManagerRenderPartial(b *testing.B) {
 	data := map[string]interface{}{
 		"title": "standalone",
 	}
@@ -152,7 +152,7 @@ func BenchmarkView_RenderPartial(b *testing.B) {
 	}
 }
 
-func BenchmarkCacheView_Render(b *testing.B) {
+func BenchmarkManagerRenderCache(b *testing.B) {
 	data := map[string]interface{}{
 		"title": "home",
 	}
@@ -163,7 +163,7 @@ func BenchmarkCacheView_Render(b *testing.B) {
 	}
 }
 
-func BenchmarkCacheView_RenderPartial(b *testing.B) {
+func BenchmarkManagerRenderPartialCache(b *testing.B) {
 	data := map[string]interface{}{
 		"title": "standalone",
 	}

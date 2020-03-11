@@ -33,7 +33,7 @@ type Manager struct {
 	funcMap       template.FuncMap
 	cache         bool
 	mutex         *sync.Mutex
-	views         map[string]map[string]*View
+	templates     map[string]map[string]*template.Template
 }
 
 // New returns a manager with the given filesystem and options.
@@ -87,8 +87,8 @@ func (m *Manager) RenderPartial(w io.Writer, view string, data interface{}) erro
 	return m.render(w, "", view, data)
 }
 
-func (m *Manager) getView(layout, view string) (*View, error) {
-	if v, ok := m.views[layout][view]; ok {
+func (m *Manager) getTemplate(layout, view string) (*template.Template, error) {
+	if v, ok := m.templates[layout][view]; ok {
 		return v, nil
 	}
 
@@ -105,7 +105,7 @@ func (m *Manager) getView(layout, view string) (*View, error) {
 	}
 	files = append(files, m.findViewFile(view))
 
-	v, err := m.newView(files)
+	v, err := m.newTemplate(files)
 	if err != nil {
 		return nil, err
 	}
@@ -113,19 +113,19 @@ func (m *Manager) getView(layout, view string) (*View, error) {
 	if m.cache {
 		m.mutex.Lock()
 		defer m.mutex.Unlock()
-		if m.views == nil {
-			m.views = make(map[string]map[string]*View)
+		if m.templates == nil {
+			m.templates = make(map[string]map[string]*template.Template)
 		}
-		if _, ok := m.views[layout]; !ok {
-			m.views[layout] = make(map[string]*View)
+		if _, ok := m.templates[layout]; !ok {
+			m.templates[layout] = make(map[string]*template.Template)
 		}
-		m.views[layout][view] = v
+		m.templates[layout][view] = v
 	}
 
 	return v, nil
 }
 
-func (m *Manager) newView(files []string) (*View, error) {
+func (m *Manager) newTemplate(files []string) (*template.Template, error) {
 	tmpl := template.New(path.Base(files[0])).
 		Funcs(m.funcMap).
 		Delims(m.delims[0], m.delims[1])
@@ -146,7 +146,7 @@ func (m *Manager) newView(files []string) (*View, error) {
 		}
 	}
 
-	return &View{tmpl}, nil
+	return tmpl, nil
 }
 
 func (m *Manager) findViewFile(view string) string {
@@ -170,7 +170,7 @@ func (m *Manager) getFileName(view string) string {
 }
 
 func (m *Manager) render(w io.Writer, layout, view string, data interface{}) error {
-	v, err := m.getView(layout, view)
+	v, err := m.getTemplate(layout, view)
 	if err != nil {
 		return err
 	}
