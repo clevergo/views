@@ -1,39 +1,34 @@
 Views Manager Example
 ---------------------
 
+## Structure
+
+Let's take a look of an example views structure before digging into it:
+
+```
+layouts/                  contains layout files.
+    main.tmpl
+    page.tmpl
+    ...
+    partials/             contains partial files.
+        head.tmpl
+        header.tmpl
+        footer.tmpl
+        ...
+site/                     contains site's views.
+    home.tmpl
+    ...
+user/                     contains user's views.
+    login.tmpl
+    setting.tmpl
+    signup.tmpl
+    ...
+...
+```
+
+## Try it
+
 ```shell
 $ cd example
 $ go run main.go
-
-$ curl http://localhost:1234/
-<html>
-    <head>
-        <title>Home</title>
-    </head>
-    <body>
-        <header>Header</header>
-        <h1>Hello World</h1>
-        <footer>Footer</footer>
-    </body>
-</html
-
-$ curl http://localhost:1234/login
-<html>
-    <head>
-        <title>Login</title>
-    </head>
-    <body>
-        <h1>Login</h1>
-    </body>
-</html>
-
-$ curl http://localhost:1234/partial
-<html>
-    <head>
-        <title>Partial</title>
-    </head>
-    <body>
-        <h1>Partial</h1>
-    </body>
-</html>
 ```

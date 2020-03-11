@@ -32,10 +32,13 @@ func TestMain(m *testing.M) {
 			"title": strings.Title,
 		}),
 	)
+	testManager.cache = false
 	testManager.AddLayout("main", "head", "header", "footer")
+
 	testCacheManager = &Manager{}
 	*testCacheManager = *testManager
 	testCacheManager.cache = true
+
 	m.Run()
 }
 

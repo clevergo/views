@@ -2,10 +2,11 @@
 
 Views is a templates(html/template) manager,  it provides the following features:
 
-- **Nested template**: it is easy to create a complicated template, see [usage](#usage).
+- **File System**: it use `http.FileSystem` to parse template files, allows to embed view files into go binary easilly by third-party tools, 
+	such as [packr](https://github.com/gobuffalo/packr), [statik](https://github.com/rakyll/statik) etc. See [example](example).
+- **Simple**: it bases on html/template, nothing more.
 - **Cache**: allow to cache parsed templates(default to enabled), see [benchmark](#benchmark).
 - **Global settings**: it provides some useful setting for all templates, such as suffix, delimiters, funcMap etc.
-- **[Hooks](#hooks)**: provides two hooks, `BeforeRenderEvent` and `AfterRenderEvent`.
 
 ## Usage
 
@@ -15,35 +16,10 @@ $ go get github.com/clevergo/views/v2
 
 Please take a look of the [example](example).
 
-### Structure
-
-Let's take a look of an example views structure before digging into it:
-
-```
-layouts/                  contains layout files.
-    main.tmpl
-    page.tmpl
-    ...
-    partials/             contains partial files.
-        head.tmpl
-        header.tmpl
-        footer.tmpl
-        ...
-site/                     contains site's views.
-    home.tmpl
-    ...
-user/                     contains user's views.
-    login.tmpl
-    setting.tmpl
-    signup.tmpl
-    ...
-...
-```
-
 ### Initialize
 
 ```go
-viewsPath := "views" // views path.
+fs = http.Dir("./views") // file system, you can use packr, statik or other file system instead.
 // options
 opts := []views.Option{
 	// views.Suffix(".tmpl"), // template suffix, default to .tmpl.
@@ -78,7 +54,7 @@ manager.Render(w, "site/index", nil)
 manager.RenderLayout(w, "page", "user/login", nil)
 
 // render with data
-manager.Render(w, "site/index", views.Context{
+manager.Render(w, "site/index", map[string]interface{}{
 	"foo": "bar",
 })
 
@@ -86,28 +62,14 @@ manager.Render(w, "site/index", views.Context{
 manager.RenderPartial(w, "site/partial", nil)
 ```
 
-## Hooks
-
-```go
-// regiters before render listener.
-manager.RegisterOnBeforeRender(func(event *views.BeforeRenderEvent) error {
-	return nil
-})
-
-// regiters after render listener.
-manager.RegisterOnAfterRender(func(event *views.AfterRenderEvent) error {
-	return nil
-})
-```
-
 ## Benchmark
 
 ```shell
 $ go test -bench=.
-BenchmarkView_Render-12                     6452            173335 ns/op
-BenchmarkView_RenderPartial-12             31501             38441 ns/op
-BenchmarkCacheView_Render-12              286412              4278 ns/op
-BenchmarkCacheView_RenderPartial-12       316054              3750 ns/op
+BenchmarkView_Render-12                     5670            235214 ns/op
+BenchmarkView_RenderPartial-12             16450             64282 ns/op
+BenchmarkCacheView_Render-12              237700              4724 ns/op
+BenchmarkCacheView_RenderPartial-12       364700              3269 ns/op
 ```
 
 The benchmark is base on the [example](example) that mentioned above, the result is depended on how complicated the template is. 
