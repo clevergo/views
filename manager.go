@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"path"
+	"strings"
 	"sync"
 )
 
@@ -149,15 +150,19 @@ func (m *Manager) newView(files []string) (*View, error) {
 }
 
 func (m *Manager) findViewFile(view string) string {
-	return path.Join(m.getFileName(view))
+	return m.absFilepath(m.getFileName(view))
 }
 
 func (m *Manager) findLayoutFile(layout string) string {
-	return path.Join(m.layoutsDir, m.getFileName(layout))
+	return m.absFilepath(path.Join(m.layoutsDir, m.getFileName(layout)))
 }
 
 func (m *Manager) findPartialFile(partial string) string {
-	return path.Join(m.layoutsDir, m.partialsDir, m.getFileName(partial))
+	return m.absFilepath(path.Join(m.layoutsDir, m.partialsDir, m.getFileName(partial)))
+}
+
+func (m *Manager) absFilepath(path string) string {
+	return "/" + strings.TrimLeft(path, "/")
 }
 
 func (m *Manager) getFileName(view string) string {
