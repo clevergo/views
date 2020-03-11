@@ -16,6 +16,32 @@ $ go get github.com/clevergo/views/v2
 
 Please take a look of the [example](example).
 
+### Structure
+
+Assume directory structure looks like:
+
+```
+views/
+	layouts/                  contains layout files.
+    	main.tmpl
+    	page.tmpl
+    	...
+    	partials/             contains partial files.
+        	head.tmpl
+        	header.tmpl
+        	footer.tmpl
+        	...
+	site/                     contains site's views.
+	    home.tmpl
+	    ...
+	user/                     contains user's views.
+    	login.tmpl
+    	setting.tmpl
+    	signup.tmpl
+    	...
+	...
+```
+
 ### Initialize
 
 ```go
